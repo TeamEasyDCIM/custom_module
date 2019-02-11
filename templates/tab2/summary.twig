@@ -1,0 +1,30 @@
+{% extends baseLayout %}
+
+{% block contentHeader %}
+    <div class="content-header-top">
+        <h1>{{ trans('CustomModule::backend.tab2') }}</h1>
+    </div>
+
+    <div class="content-header-tabs">
+        {{ tabs|raw }}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="content-in content-widgetable">
+        <div class="content-scroll">
+            <h2>{{ trans('CustomModule::backend.item_types') }}</h2>
+            <pre class="pre-scrollable">{{ dump(types) }}</pre>
+
+            <h2>{{ trans('CustomModule::backend.locations') }}</h2>
+            <pre class="pre-scrollable">{{ dump(locations) }}</pre>
+        </div>
+    </div>
+    <style type="text/css">
+        .pre-scrollable {
+            max-height: 340px;
+            overflow-y: scroll;
+            background-color: #ffffff;
+        }
+    </style>
+{% endblock %}

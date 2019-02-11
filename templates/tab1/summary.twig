@@ -1,0 +1,19 @@
+{% extends baseLayout %}
+
+{% block contentHeader %}
+    <div class="content-header-top">
+        <h1>{{ trans('CustomModule::backend.tab1') }}</h1>
+    </div>
+
+    <div class="content-header-tabs">
+        {{ tabs|raw }}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="content-in content-widgetable">
+        <div class="content-scroll content-scroll-full">
+            {{ table|raw }}
+        </div>
+    </div>
+{% endblock %}
