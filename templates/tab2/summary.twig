@@ -13,18 +13,19 @@
 {% block content %}
     <div class="content-in content-widgetable">
         <div class="content-scroll">
-            <h2>{{ trans('CustomModule::backend.item_types') }}</h2>
-            <pre class="pre-scrollable">{{ dump(types) }}</pre>
-
-            <h2>{{ trans('CustomModule::backend.locations') }}</h2>
-            <pre class="pre-scrollable">{{ dump(locations) }}</pre>
+            <div class="panel">
+                <div class="panel-body">
+                    <h2>GET Request | ItemType - List the types</h2>
+                    Method <strong>getRequest()</strong> in file: /opt/easydcim/modules/addons/CustomModule/Controller/PageController.php
+                    <p><a href="https://www.easydcim.com/api/index.html#api-ItemType-Index">https://www.easydcim.com/api/index.html#api-ItemType-Index</a></p>
+                    <a target="_blank" class="btn btn-primary" href="{{ url('backend/custom-module/api/get-request') }}"><strong>Run GET Request</strong></a>
+                    <hr />
+                    <h2>POST Request | Device - Create device</h2>
+                    Method <strong>postRequest()</strong> in file: /opt/easydcim/modules/addons/CustomModule/Controller/PageController.php
+                    <p><a href="https://www.easydcim.com/api/index.html#api-Device-Create">https://www.easydcim.com/api/index.html#api-Device-Create</a></p>
+                    <a target="_blank" class="btn btn-primary" href="{{ url('backend/custom-module/api/post-request') }}"><strong>Run POST Request</strong></a>
+                </div>
+            </div>
         </div>
     </div>
-    <style type="text/css">
-        .pre-scrollable {
-            max-height: 340px;
-            overflow-y: scroll;
-            background-color: #ffffff;
-        }
-    </style>
 {% endblock %}

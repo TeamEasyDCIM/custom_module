@@ -2,7 +2,6 @@
 
 namespace Modules\Addons\CustomModule\Controller;
 
-use Components\Core\Support\Facades\ApiCaller;
 use Components\Libs\Grid\DataTableResponse;
 use Components\Libs\Grid\GridTableGenerator;
 
@@ -37,18 +36,83 @@ class PageController extends OutputController
     /**
      * @return \View
      */
-    public function showTab2()
+    public function apiRequest()
+    {
+        return view('CustomModule::tab2.summary', []);
+    }
+
+    /**
+     * @return string|void
+     */
+    public function getRequest()
     {
         /**
-         * List Item Types From API
+         * Endpoint URL
          */
-        $types = ApiCaller::get('type');
+        $url = url('api/v2/type');
 
         /**
-         * List Locations From API
+         * First Admin API Key - you should enter your own user api key
          */
-        $locations = ApiCaller::get('location');
+        $apikey = \User::admins()->first()->apikey->key;
 
-        return view('CustomModule::tab2.summary', ['types' => $types, 'locations' => $locations]);
+        $client = new \GuzzleHttp\Client();
+
+        $response = $client->request('GET', $url, [
+            'headers' => [
+                'Accept' => 'application/json',
+                'apikey' => $apikey
+            ],
+        ]);
+
+        $stream = \GuzzleHttp\Psr7\stream_for($response->getBody());
+
+        return d($stream->getContents());
+    }
+
+    /**
+     * @return string|void
+     */
+    public function postRequest()
+    {
+        /**
+         * Endpoint URL
+         */
+        $url = url('api/v2/device');
+
+        /**
+         * First Admin API Key - you should enter your own user api key
+         */
+        $apikey = \User::admins()->first()->apikey->key;
+
+        $client = new \GuzzleHttp\Client();
+
+        try {
+            $response = $client->request('POST', $url, [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'apikey' => $apikey
+                ],
+                'json' => [
+                    'data' => [
+                        'label' => 'My Device Label',
+                        'model' => 'Dell PowerEdge R210',
+                        'type_id' => 4
+                    ],
+                    'metadata' => [
+                        'Hostname' => 'myhost.net',
+                        'IP Address' => '10.10.10.100',
+                        'SNMP Public Community' => 'public',
+                        'SNMP Private Community' => 'private'
+                    ]
+                ]
+            ]);
+
+            $stream = \GuzzleHttp\Psr7\stream_for($response->getBody());
+
+            d($stream->getContents());
+        } catch (\Exception $e) {
+            d($e->getMessage());
+        }
     }
 }
