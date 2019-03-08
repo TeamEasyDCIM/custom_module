@@ -1,11 +1,11 @@
 <?php
 
-namespace Modules\Addons\CustomModule\Controller\Api;
+namespace Modules\Addons\CustomModule\Controller\Api\v2;
 use Modules\Addons\CustomModule\Controller\OutputController;
 
 /**
  * Class LocationsController
- * @package Modules\Addons\CustomModule\Controller\Api
+ * @package Modules\Addons\CustomModule\Controller\Api\v2
  */
 class LocationsController extends OutputController
 {

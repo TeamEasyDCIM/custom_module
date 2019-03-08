@@ -44,6 +44,11 @@ class CustomModuleProvider extends ModuleServiceProvider
                 $app['router']->get('/custom-module/api/post-request', ['uses' => 'PageController@postRequest']);
             });
 
+            $app['router']->group(['namespace' => 'Modules\Addons\CustomModule\Controller\Api\v2', 'prefix' => 'backend'], function() use($app)
+            {
+                $app['router']->get('/custom-module/order/create', ['uses' => 'OrdersController@createOrder']);
+            });
+
             /**
              * Client Area Routes
              */
@@ -53,13 +58,6 @@ class CustomModuleProvider extends ModuleServiceProvider
                     'as' => 'clientarea.core.services.custom.page',
                     'uses' => 'ClientAreaController@showCustomPage'
                 ])->where(array('id' => '^\d+$'));
-            });
-
-            $app['router']->group(['namespace' => 'Modules\Addons\CustomModule\Controller\Api\v2', 'prefix' => 'api/v2'], function() use($app)
-            {
-                /**
-                 * API Routes for Module
-                 */
             });
         });
 
