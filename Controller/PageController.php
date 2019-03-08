@@ -68,6 +68,7 @@ class PageController extends OutputController
         $stream = \GuzzleHttp\Psr7\stream_for($response->getBody());
 
         s($stream->getContents());
+        
     }
 
     /**
