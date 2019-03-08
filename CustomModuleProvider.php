@@ -38,6 +38,7 @@ class CustomModuleProvider extends ModuleServiceProvider
             $app['router']->group(['namespace' => 'Modules\Addons\CustomModule\Controller', 'prefix' => 'backend'], function() use($app)
             {
                 $app['router']->get('/custom-module/tab1', ['as' => 'backend.custom.module.tab1', 'uses' => 'PageController@showTab1']);
+                $app['router']->post('/custom-module/tab1/edit/quick', ['as' => 'backend.custom.module.tab1.edit.quick', 'uses' => 'PageController@quickEdit']);
                 $app['router']->get('/custom-module/api', ['as' => 'backend.custom.module.tab2', 'uses' => 'PageController@apiRequest']);
                 $app['router']->get('/custom-module/api/get-request', ['uses' => 'PageController@getRequest']);
                 $app['router']->get('/custom-module/api/post-request', ['uses' => 'PageController@postRequest']);

@@ -21,6 +21,7 @@ class PageController extends OutputController
         // Create new table generator instance
         $table = new GridTableGenerator($devices);
         $table->setColumns(config('CustomModule::devices.columns.device'));
+        $table->addAdditionalParam('editURL', route('backend.custom.module.tab1.edit.quick'));
 
         // Check whether you need a JSON response
         if ($this->wantsCleanJsonResponse()) {
@@ -31,6 +32,32 @@ class PageController extends OutputController
         }
 
         return view('CustomModule::tab1.summary', ['table' => $table]);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function quickEdit()
+    {
+        $id = input_get('pk');
+        $column = input_get('name');
+        $value = input_get('value');
+
+        $device = \Device::findOrFail($id);
+        $device->{$column} = e($value);
+
+        if ($device->save()) {
+            return response_json([
+                'status' => 'success',
+                'message' => trans('backend/global.success'),
+                'newValue' => $device->getPresenterValue($column)
+            ]);
+        }
+
+        return response_json([
+            'status' => 'error',
+            'message' => $device->validationErrors()->first()
+        ]);
     }
 
     /**
@@ -68,7 +95,7 @@ class PageController extends OutputController
         $stream = \GuzzleHttp\Psr7\stream_for($response->getBody());
 
         s($stream->getContents());
-        
+
     }
 
     /**
