@@ -44,9 +44,12 @@ class CustomModuleProvider extends ModuleServiceProvider
                 $app['router']->get('/custom-module/api/post-request', ['uses' => 'PageController@postRequest']);
             });
 
+            /**
+             * Test API Route
+             */
             $app['router']->group(['namespace' => 'Modules\Addons\CustomModule\Controller\Api\v2', 'prefix' => 'backend'], function() use($app)
             {
-                $app['router']->get('/custom-module/api/test-request', ['uses' => 'ItemTypesController@updateType']);
+                $app['router']->get('/custom-module/api/test-request', ['uses' => 'DeviceBaysController@listBays']);
             });
 
             /**
