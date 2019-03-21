@@ -22,7 +22,7 @@ class LocationsController extends OutputController
         /**
          * First Admin API Key - you should enter your own user api key
          */
-        $apikey = \User::admins()->first()->apikey->key;
+        $apikey = \User::first()->apikey->key;
 
         $client = new \GuzzleHttp\Client();
 
@@ -63,7 +63,7 @@ class LocationsController extends OutputController
         /**
          * First Admin API Key - you should enter your own user api key
          */
-        $apikey = \User::admins()->first()->apikey->key;
+        $apikey = \User::first()->apikey->key;
 
         $client = new \GuzzleHttp\Client();
 
@@ -103,7 +103,7 @@ class LocationsController extends OutputController
         /**
          * First Admin API Key - you should enter your own user api key
          */
-        $apikey = \User::admins()->first()->apikey->key;
+        $apikey = \User::first()->apikey->key;
 
         $client = new \GuzzleHttp\Client();
 

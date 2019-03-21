@@ -49,7 +49,38 @@ class CustomModuleProvider extends ModuleServiceProvider
              */
             $app['router']->group(['namespace' => 'Modules\Addons\CustomModule\Controller\Api\v2', 'prefix' => 'backend'], function() use($app)
             {
-                $app['router']->get('/custom-module/api/test-request', ['uses' => 'DeviceBaysController@listBays']);
+                /**
+                 * Orders
+                 */
+                $app['router']->get('/custom-module/api/order/create', ['uses' => 'OrdersController@createOrder']);
+                $app['router']->get('/custom-module/api/order/update', ['uses' => 'OrdersController@updateOrder']);
+                $app['router']->get('/custom-module/api/order/delete', ['uses' => 'OrdersController@deleteOrder']);
+
+                /**
+                 * Locations
+                 */
+                $app['router']->get('/custom-module/api/location/create-location', ['uses' => 'LocationsController@createLocation']);
+                $app['router']->get('/custom-module/api/location/create-floor', ['uses' => 'LocationsController@createFloor']);
+                $app['router']->get('/custom-module/api/location/create-rack', ['uses' => 'LocationsController@createRack']);
+
+                /**
+                 * Item Types
+                 */
+                $app['router']->get('/custom-module/api/item-type/create', ['uses' => 'ItemTypesController@createType']);
+                $app['router']->get('/custom-module/api/item-type/update', ['uses' => 'ItemTypesController@updateType']);
+
+                /**
+                 * Device Bays
+                 */
+                $app['router']->get('/custom-module/api/device-bay/list', ['uses' => 'DeviceBaysController@listBays']);
+                $app['router']->get('/custom-module/api/device-bay/create', ['uses' => 'DeviceBaysController@createBay']);
+                $app['router']->get('/custom-module/api/device-bay/update', ['uses' => 'DeviceBaysController@updateBay']);
+                $app['router']->get('/custom-module/api/device-bay/delete', ['uses' => 'DeviceBaysController@deleteBay']);
+
+                /**
+                 * Item Ports
+                 */
+                $app['router']->get('/custom-module/api/item-port/create', ['uses' => 'ItemPortsController@createPort']);
             });
 
             /**
