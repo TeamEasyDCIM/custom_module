@@ -50,6 +50,11 @@ class CustomModuleProvider extends ModuleServiceProvider
             $app['router']->group(['namespace' => 'Modules\Addons\CustomModule\Controller\Api\v2', 'prefix' => 'backend'], function() use($app)
             {
                 /**
+                 * Devices
+                 */
+                $app['router']->get('/custom-module/api/device/create', ['uses' => 'DevicesController@createDevice']);
+
+                /**
                  * Orders
                  */
                 $app['router']->get('/custom-module/api/order/create', ['uses' => 'OrdersController@createOrder']);
