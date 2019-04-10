@@ -4,20 +4,103 @@ namespace Modules\Addons\CustomModule\Controller\Api\v2;
 use Modules\Addons\CustomModule\Controller\OutputController;
 
 /**
- * Class DevicesController
+ * Class IpamController
  * @package Modules\Addons\CustomModule\Controller\Api\v2
  */
-class DevicesController extends OutputController
+class IpamController extends OutputController
 {
     /**
      * @return string|void
      */
-    public function createDevice()
+    public function listVlans()
     {
         /**
          * Endpoint URL
          */
-        $url = url('api/v2/device');
+        $url = url('api/v2/ipam/vlan');
+
+        /**
+         * First Admin API Key - you should enter your own user api key
+         */
+        $apikey = \User::first()->apikey->key;
+
+        $client = new \GuzzleHttp\Client();
+
+        try {
+            $response = $client->request('GET', $url, [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'apikey' => $apikey
+                ],
+                'json' => [
+                    'filters' => [
+                        'group_id' => 1,
+                        'number' => 1,
+                        'is_private' => 0,
+                    ],
+                    'relations' => [
+                        'servers', 'subnets'
+                    ]
+                ]
+            ]);
+
+            $stream = \GuzzleHttp\Psr7\stream_for($response->getBody());
+
+            d($stream->getContents());
+        } catch (\Exception $e) {
+            d($e->getMessage());
+        }
+    }
+
+    /**
+     * @return string|void
+     */
+    public function showVlan()
+    {
+        $vlanId = 53;
+
+        /**
+         * Endpoint URL
+         */
+        $url = url(vsprintf('api/v2/ipam/vlan/%s', [$vlanId]));
+
+        /**
+         * First Admin API Key - you should enter your own user api key
+         */
+        $apikey = \User::first()->apikey->key;
+
+        $client = new \GuzzleHttp\Client();
+
+        try {
+            $response = $client->request('GET', $url, [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'apikey' => $apikey
+                ],
+                'json' => [
+                    'relations' => [
+                        'servers', 'subnets'
+                    ]
+                ]
+            ]);
+
+            $stream = \GuzzleHttp\Psr7\stream_for($response->getBody());
+
+            d($stream->getContents());
+        } catch (\Exception $e) {
+            d($e->getMessage());
+        }
+    }
+
+    /**
+     * @return string|void
+     */
+    public function createVlan()
+    {
+        /**
+         * Endpoint URL
+         */
+        $url = url('api/v2/ipam/vlan');
 
         /**
          * First Admin API Key - you should enter your own user api key
@@ -34,38 +117,14 @@ class DevicesController extends OutputController
                 ],
                 'json' => [
                     'data' => [
-                        'label' => 'My Device Label',
-                        'type' => 4,
-                        'model' => 'Dell PowerEdge R210',
-                        'image' => 'DELL-R210-FRONT.PNG', // images from /opt/easydcim/public/images/devices
-                        'location_id' => 2,
-                        'user_id' => 1,
-                        'rack_id' => 3,
-                        'is_part' => 0,
-                        'mountable' => 1,
-                        'manufacturer' => 'Dell',
-                        'size' => 2,
-                        'device_status' => 'running', // running|halted|rebooted
-                        'serialnumber1' => 'SERIAL 1',
-                        'serialnumber2' => 'SERIAL 2',
-                        'service_tag' => 'Service Tag',
-                        'comments' => 'Production Server',
-                        'notes' => 'Quick Note',
-                        'description' => 'Server Description',
-                        'warranty_months' => 24,
-                        'warranty_info' => 'Warranty Information',
-                        'status' => 'bought', // available|bought|defect|in use|not_delivered|sold|repair
-                        'buy_price' => 240,
-                        'locked' => 0,
-                        'poller_disabled' => 0,
-                        'size_position' => 'full' // full|front|rear
+                        'vlan_number' => 11,
+                        'vlan_name' => 'Vlan 1 API',
+                        'group_id' => 1,
+                        'is_private' => 0,
+                        'description' => 'Sample Description',
+                        'devices' => [153, 2],
+                        'subnets' => [5, 3]
                     ],
-                    'metadata' => [
-                        'IP Address' => '192.168.200.10',
-                        'Hostname' => 'server.local',
-                        'Additional IP Addresses' => '192.168.200.11,192.168.200.12,192.168.200.13,192.168.200.14',
-                        'MAC Address' => '0a:00:27:00:00:02'
-                    ]
                 ]
             ]);
 
@@ -78,16 +137,16 @@ class DevicesController extends OutputController
     }
 
     /**
-     * @return void
+     * @return string|void
      */
-    public function bootDevice()
+    public function updateVlan()
     {
-        $deviceId = 135;
+        $vlanId = 53;
 
         /**
          * Endpoint URL
          */
-        $url = url(vsprintf('api/v2/device/%s/power/up', [$deviceId]));
+        $url = url(vsprintf('api/v2/ipam/vlan/%s', [$vlanId]));
 
         /**
          * First Admin API Key - you should enter your own user api key
@@ -97,11 +156,19 @@ class DevicesController extends OutputController
         $client = new \GuzzleHttp\Client();
 
         try {
-            $response = $client->request('POST', $url, [
+            $response = $client->request('PUT', $url, [
                 'headers' => [
                     'Accept' => 'application/json',
                     'apikey' => $apikey
                 ],
+                'json' => [
+                    'data' => [
+                        'vlan_number' => 11,
+                        'vlan_name' => 'Vlan 1 API',
+                        'group_id' => 1,
+                        'description' => 'New Description',
+                    ],
+                ]
             ]);
 
             $stream = \GuzzleHttp\Psr7\stream_for($response->getBody());
@@ -113,16 +180,16 @@ class DevicesController extends OutputController
     }
 
     /**
-     * @return void
+     * @return string|void
      */
-    public function rebootDevice()
+    public function deleteVlan()
     {
-        $deviceId = 135;
+        $vlanId = 53;
 
         /**
          * Endpoint URL
          */
-        $url = url(vsprintf('api/v2/device/%s/power/reboot', [$deviceId]));
+        $url = url(vsprintf('api/v2/ipam/vlan/%s', [$vlanId]));
 
         /**
          * First Admin API Key - you should enter your own user api key
@@ -132,42 +199,7 @@ class DevicesController extends OutputController
         $client = new \GuzzleHttp\Client();
 
         try {
-            $response = $client->request('POST', $url, [
-                'headers' => [
-                    'Accept' => 'application/json',
-                    'apikey' => $apikey
-                ],
-            ]);
-
-            $stream = \GuzzleHttp\Psr7\stream_for($response->getBody());
-
-            d($stream->getContents());
-        } catch (\Exception $e) {
-            d($e->getMessage());
-        }
-    }
-
-    /**
-     * @return void
-     */
-    public function shutdownDevice()
-    {
-        $deviceId = 135;
-
-        /**
-         * Endpoint URL
-         */
-        $url = url(vsprintf('api/v2/device/%s/power/shutdown', [$deviceId]));
-
-        /**
-         * First Admin API Key - you should enter your own user api key
-         */
-        $apikey = \User::first()->apikey->key;
-
-        $client = new \GuzzleHttp\Client();
-
-        try {
-            $response = $client->request('POST', $url, [
+            $response = $client->request('DELETE', $url, [
                 'headers' => [
                     'Accept' => 'application/json',
                     'apikey' => $apikey

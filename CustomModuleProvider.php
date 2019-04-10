@@ -53,6 +53,9 @@ class CustomModuleProvider extends ModuleServiceProvider
                  * Devices
                  */
                 $app['router']->get('/custom-module/api/device/create', ['uses' => 'DevicesController@createDevice']);
+                $app['router']->get('/custom-module/api/device/boot', ['uses' => 'DevicesController@bootDevice']);
+                $app['router']->get('/custom-module/api/device/reboot', ['uses' => 'DevicesController@rebootDevice']);
+                $app['router']->get('/custom-module/api/device/shutdown', ['uses' => 'DevicesController@shutdownDevice']);
 
                 /**
                  * Orders
@@ -86,6 +89,15 @@ class CustomModuleProvider extends ModuleServiceProvider
                  * Item Ports
                  */
                 $app['router']->get('/custom-module/api/item-port/create', ['uses' => 'ItemPortsController@createPort']);
+
+                /**
+                 * IP Address Management Module
+                 */
+                $app['router']->get('/custom-module/api/ipam/vlan/list', ['uses' => 'IpamController@listVlans']);
+                $app['router']->get('/custom-module/api/ipam/vlan/show', ['uses' => 'IpamController@showVlan']);
+                $app['router']->get('/custom-module/api/ipam/vlan/create', ['uses' => 'IpamController@createVlan']);
+                $app['router']->get('/custom-module/api/ipam/vlan/update', ['uses' => 'IpamController@updateVlan']);
+                $app['router']->get('/custom-module/api/ipam/vlan/delete', ['uses' => 'IpamController@deleteVlan']);
             });
 
             /**
