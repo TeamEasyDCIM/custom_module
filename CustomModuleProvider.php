@@ -56,6 +56,8 @@ class CustomModuleProvider extends ModuleServiceProvider
                 $app['router']->get('/custom-module/api/device/boot', ['uses' => 'DevicesController@bootDevice']);
                 $app['router']->get('/custom-module/api/device/reboot', ['uses' => 'DevicesController@rebootDevice']);
                 $app['router']->get('/custom-module/api/device/shutdown', ['uses' => 'DevicesController@shutdownDevice']);
+                $app['router']->get('/custom-module/api/device/list', ['uses' => 'DevicesController@listDevices']);
+                $app['router']->get('/custom-module/api/device/show', ['uses' => 'DevicesController@showDevice']);
 
                 /**
                  * Orders
@@ -98,6 +100,12 @@ class CustomModuleProvider extends ModuleServiceProvider
                 $app['router']->get('/custom-module/api/ipam/vlan/create', ['uses' => 'IpamController@createVlan']);
                 $app['router']->get('/custom-module/api/ipam/vlan/update', ['uses' => 'IpamController@updateVlan']);
                 $app['router']->get('/custom-module/api/ipam/vlan/delete', ['uses' => 'IpamController@deleteVlan']);
+
+                /**
+                 * Items
+                 */
+                $app['router']->get('/custom-module/api/item/list', ['uses' => 'ItemsController@listItems']);
+                $app['router']->get('/custom-module/api/item/show', ['uses' => 'ItemsController@showItem']);
             });
 
             /**
