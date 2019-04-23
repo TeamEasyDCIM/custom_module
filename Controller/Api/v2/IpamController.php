@@ -213,4 +213,45 @@ class IpamController extends OutputController
             d($e->getMessage());
         }
     }
+
+    /**
+     * @return string|void
+     */
+    public function assignIpAddress()
+    {
+        $deviceId = 496;
+
+        /**
+         * Endpoint URL
+         */
+        $url = url(vsprintf('api/v2/ipam/device/ip/%s', [$deviceId]));
+
+        /**
+         * First Admin API Key - you should enter your own user api key
+         */
+        $apikey = \User::first()->apikey->key;
+
+        $client = new \GuzzleHttp\Client();
+
+        try {
+            $response = $client->request('POST', $url, [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'apikey' => $apikey
+                ],
+                'json' => [
+                    'data' => [
+                        'type' => 'primary', // primary or additional or ipmi
+                        'address' => '192.168.56.101',
+                    ],
+                ]
+            ]);
+
+            $stream = \GuzzleHttp\Psr7\stream_for($response->getBody());
+
+            d($stream->getContents());
+        } catch (\Exception $e) {
+            d($e->getMessage());
+        }
+    }
 }

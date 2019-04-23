@@ -65,7 +65,7 @@ class DevicesController extends OutputController
                         'rack',
                         'metadata',
                         'type',
-                        'selfParent'
+                        'selfParent',
                     ],
                     'pagination' => [
                         'page' => 1,

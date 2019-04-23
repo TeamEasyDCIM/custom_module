@@ -100,6 +100,7 @@ class CustomModuleProvider extends ModuleServiceProvider
                 $app['router']->get('/custom-module/api/ipam/vlan/create', ['uses' => 'IpamController@createVlan']);
                 $app['router']->get('/custom-module/api/ipam/vlan/update', ['uses' => 'IpamController@updateVlan']);
                 $app['router']->get('/custom-module/api/ipam/vlan/delete', ['uses' => 'IpamController@deleteVlan']);
+                $app['router']->get('/custom-module/api/ipam/ip/assign', ['uses' => 'IpamController@assignIpAddress']);
 
                 /**
                  * Items
