@@ -107,6 +107,11 @@ class CustomModuleProvider extends ModuleServiceProvider
                  */
                 $app['router']->get('/custom-module/api/item/list', ['uses' => 'ItemsController@listItems']);
                 $app['router']->get('/custom-module/api/item/show', ['uses' => 'ItemsController@showItem']);
+
+                /**
+                 * Graphs
+                 */
+                $app['router']->get('/custom-module/api/graphs/render', ['uses' => 'GraphsController@renderGraph']);
             });
 
             /**

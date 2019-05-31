@@ -56,7 +56,7 @@ class PageController extends OutputController
 
         return response_json([
             'status' => 'error',
-            'message' => $device->validationErrors()->first()
+            'message' => $device->validationBag()->first()
         ]);
     }
 
