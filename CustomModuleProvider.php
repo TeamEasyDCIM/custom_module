@@ -5,6 +5,7 @@ namespace Modules\Addons\CustomModule;
 use Components\Core\Support\Providers\ModuleServiceProvider;
 use Components\Front\Core\Widgets\CASmartBoxGenerator;
 use Components\Libs\Widgets\SmartBoxGenerator;
+use Illuminate\Support\Collection;
 use Modules\Addons\CustomModule\Widgets\ClientArea\CustomWidgetServiceSummary;
 use Modules\Addons\CustomModule\Widgets\CustomModuleDeviceWidget;
 use Modules\Addons\CustomModule\Commands\CustomModuleCommand;
@@ -132,6 +133,7 @@ class CustomModuleProvider extends ModuleServiceProvider
         // $this->registerCommand();
         // $this->clientAreaEvents();
         // $this->orderEvents();
+        // $this->tableColumns();
 
         parent::register('CustomModule');
     }
@@ -246,10 +248,34 @@ class CustomModuleProvider extends ModuleServiceProvider
         });
     }
 
+    /**
+     * Register a new command
+     */
     private function registerCommand()
     {
         $this->app['events']->listen('artisan.command.register', function() {
             \Artisan::add(new CustomModuleCommand);
+        });
+    }
+
+    /**
+     * Add additional columns to the table
+     */
+    private function tableColumns()
+    {
+        $this->app['events']->listen('easydcim.grid: columns', function(Collection $columns, $modelName, $path) {
+            if($modelName == 'server') {
+                $columns->put('a_column', [
+                    'label' => trans('custom-module::backend.column_1'),
+                    'sortable' => true,
+                    'type' => 'Key',
+                    'value' => function($model) {
+                        return $model->id;
+                    }
+                ]);
+            }
+
+            return $columns;
         });
     }
 }
