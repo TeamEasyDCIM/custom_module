@@ -134,6 +134,7 @@ class CustomModuleProvider extends ModuleServiceProvider
         // $this->clientAreaEvents();
         // $this->orderEvents();
         // $this->tableColumns();
+        // $this->customTemplateScripts();
 
         parent::register('CustomModule');
     }
@@ -276,6 +277,24 @@ class CustomModuleProvider extends ModuleServiceProvider
             }
 
             return $columns;
+        });
+    }
+
+    /**
+     * Add additional JS and CSS
+     */
+    private function customTemplateScripts()
+    {
+        $this->app['events']->listen('easydcim.assets: template.js', function(\ArrayObject $scripts) {
+            $scripts[] = base_path('modules/addons/CustomModule/templates/admin/default/assets/js/custom-app.js');
+
+            return $scripts;
+        });
+
+        $this->app['events']->listen('easydcim.assets: template.css', function(\ArrayObject $scripts) {
+            $scripts[] = base_path('modules/addons/CustomModule/templates/admin/default/assets/css/style.css');
+
+            return $scripts;
         });
     }
 }
