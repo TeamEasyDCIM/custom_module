@@ -5,6 +5,8 @@ namespace Modules\Addons\CustomModule;
 use Components\Core\Support\Providers\ModuleServiceProvider;
 use Components\Front\Core\Widgets\CASmartBoxGenerator;
 use Components\Libs\Widgets\SmartBoxGenerator;
+use EasyDcim\Components\Provisioning\Log\LogService;
+use EasyDcim\Components\Provisioning\Modules\ProvisioningModuleInterface;
 use Illuminate\Support\Collection;
 use Modules\Addons\CustomModule\Widgets\ClientArea\CustomWidgetServiceSummary;
 use Modules\Addons\CustomModule\Widgets\CustomModuleDeviceWidget;
@@ -135,6 +137,8 @@ class CustomModuleProvider extends ModuleServiceProvider
         // $this->orderEvents();
         // $this->tableColumns();
         // $this->customTemplateScripts();
+        // $this->registerOrderSettings();
+        // $this->serviceOrderActions();
 
         parent::register('CustomModule');
     }
@@ -295,6 +299,56 @@ class CustomModuleProvider extends ModuleServiceProvider
             $scripts[] = base_path('modules/addons/CustomModule/templates/admin/default/assets/css/style.css');
 
             return $scripts;
+        });
+    }
+
+    /**
+     * Register orders additional functions
+     *
+     * @return void
+     */
+    private function registerOrderSettings()
+    {
+        $this->app['events']->listen('easydcim.provisioning: server.service.suspend', function(\ArrayObject $options) {
+            $options['custom_module_action_suspend'] = '[Custom Module] Custom Suspend Action';
+
+            return $options;
+        });
+
+        $this->app['events']->listen('easydcim.provisioning: server.service.unsuspend', function(\ArrayObject $options) {
+            $options['custom_module_action_unsuspend'] = '[Custom Module] Custom Unsuspend Action';
+
+            return $options;
+        });
+    }
+
+    /**
+     * @return void
+     */
+    private function serviceOrderActions()
+    {
+        $this->app['events']->listen('easydcim.provisioning: serverprovisioningmodule.suspend.after', function(
+            \Order $order,
+            \Device $device,
+            LogService $logger,
+            ProvisioningModuleInterface $module,
+            $configuration
+        ) {
+            if(in_array('custom_module_action_suspend', $configuration)) {
+                module_provisioning_log($logger->getLogger(), $module, '[Custom Module] Trying to run custom suspend action');
+            }
+        });
+
+        $this->app['events']->listen('easydcim.provisioning: serverprovisioningmodule.unsuspend.after', function(
+            \Order $order,
+            \Device $device,
+            LogService $logger,
+            ProvisioningModuleInterface $module,
+            $configuration
+        ) {
+            if(in_array('custom_module_action_unsuspend', $configuration)) {
+                module_provisioning_log($logger->getLogger(), $module, '[Custom Module] Trying to run custom unsuspend action');
+            }
         });
     }
 }
