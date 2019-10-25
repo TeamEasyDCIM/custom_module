@@ -36,14 +36,22 @@ class OrdersController extends OutputController
                     'module' => 'Server',
                     'client' => 1,
                     'criteria' => [
-                        'model' => 12,
+                        'model' => 23,
                         'location' => \Location::first()->getAttribute('id'),
                         'require_parts' => 1,
                         'parts' => [
-                            8 => ['model' => 16, 'hdd.size' => '1048576'],
-                            9 => ['model' => 25, 'ssd.size' => '524288|1048576'],
-                            10 => ['model' => 18, 'ram.size' => '8192'],
-                            11 => ['model' => 17, 'cpu.cores' => '8-16']
+                            8 => [
+                                'model' => [25],
+                                'hdd.size' => [1048576]
+                            ],
+                            10 => [
+                                'model' => [
+                                    24, 24
+                                ],
+                                'ram.size' => [
+                                    4096, 8096
+                                ]
+                            ],
                         ],
                         'require_pdu' => 0,
                         'require_switch' => 0,
