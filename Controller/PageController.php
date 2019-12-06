@@ -4,6 +4,7 @@ namespace Modules\Addons\CustomModule\Controller;
 
 use Components\Libs\Grid\DataTableResponse;
 use Components\Libs\Grid\GridTableGenerator;
+use Components\NetConf\NetConf;
 
 /**
  * Class PageController
@@ -32,6 +33,76 @@ class PageController extends OutputController
         }
 
         return view('CustomModule::tab1.summary', ['table' => $table]);
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function enableAction($id)
+    {
+        $device = \Device::findOrFail($id);
+
+        /**
+         * Device Metadata
+         */
+        $metadata = $device->getMetaListAttribute();
+
+        echo '<pre>';
+        print_r($metadata);
+        echo '</pre>';
+
+        /**
+         * Device Ports
+         * Database Query https://laravel.com/docs/4.2/queries
+         */
+        $users = \DB::table('item_ports')->where('item_id', $id)->get();
+
+        echo '<pre>';
+        print_r($users);
+        echo '</pre>';
+
+        /**
+         * Netconf Samples
+         */
+        $netconf = $device->netconf();
+
+        if($netconf instanceof NetConf) {
+            $command = $netconf->sendRPC(vsprintf('
+<load-configuration action="set">
+<configuration-set>set interfaces %s disable</configuration-set>
+</load-configuration>', ['interface-name']));
+
+            $commandErrorMessage = array_get($command->getResponseArray(), 'load-configuration-results.rpc-error.error-message');
+
+            if(! empty($commandErrorMessage)) {
+                echo '<pre>';
+                print_r($command->getRPCError());
+                echo '</pre>';
+                die();
+            }
+
+            $commit = $netconf->commit();
+
+            echo '<pre>';
+            print_r($commit->isRPCReplyOK());
+            echo '</pre>';
+            die();
+        }
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function disableAction($id)
+    {
+        $device = \Device::findOrFail($id);
+
+        echo '<pre>';
+        print_r($device->toArray());
+        echo '</pre>';
+        die();
     }
 
     /**

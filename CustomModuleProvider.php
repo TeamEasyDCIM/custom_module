@@ -38,9 +38,11 @@ class CustomModuleProvider extends ModuleServiceProvider
             /**
              * Backend Routes
              */
-            $app['router']->group(['namespace' => 'Modules\Addons\CustomModule\Controller', 'prefix' => 'backend'], function() use($app)
+            $app['router']->group(['namespace' => 'Modules\Addons\CustomModule\Controller', 'prefix' => 'backend', 'before' => 'acl', 'perm' => 'core.modules.addons.custom-module'], function() use($app)
             {
                 $app['router']->get('/custom-module/tab1', ['as' => 'backend.custom.module.tab1', 'uses' => 'PageController@showTab1']);
+                $app['router']->get('/custom-module/tab1/{id}/action/enable', ['as' => 'backend.custom.module.tab1.action.enable', 'uses' => 'PageController@enableAction']);
+                $app['router']->get('/custom-module/tab1/{id}/action/disable', ['as' => 'backend.custom.module.tab1.action.disable', 'uses' => 'PageController@disableAction']);
                 $app['router']->post('/custom-module/tab1/edit/quick', ['as' => 'backend.custom.module.tab1.edit.quick', 'uses' => 'PageController@quickEdit']);
                 $app['router']->get('/custom-module/api', ['as' => 'backend.custom.module.tab2', 'uses' => 'PageController@apiRequest']);
                 $app['router']->get('/custom-module/api/get-request', ['uses' => 'PageController@getRequest']);
@@ -202,6 +204,8 @@ class CustomModuleProvider extends ModuleServiceProvider
              * @var $device \Device
              */
             $device = $service->relatedItem();
+
+            file_put_contents(base_path('/tmp/device_dump.log'), $device->toJson());
 
             /**
              * Assign metadata to device

@@ -47,6 +47,9 @@ return array
             'uptime' => array('label' => 'backend/global.uptime', 'sortable' => false, 'type' => 'Key', 'modifier' => function ($model) {
                 return $model->uptime;
             }),
+            'custom_column' => array('label' => 'Custom Column', 'editable' => false, 'sortable' => false, 'value' => function($model) {
+                return view('CustomModule::tab1.custom_column', ['model' => $model]);
+            }),
             ':actions' => array
             (
                 'label' => '',
