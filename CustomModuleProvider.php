@@ -141,8 +141,28 @@ class CustomModuleProvider extends ModuleServiceProvider
         // $this->customTemplateScripts();
         // $this->registerOrderSettings();
         // $this->serviceOrderActions();
+        // $this->restrictBackendAccess();
 
         parent::register('CustomModule');
+    }
+
+    /**
+     * If the incoming address matches against any value in the array,
+     * the function will deny access with a redirect header to the EasyDCIM base URL
+     */
+    private function restrictBackendAccess()
+    {
+        if($this->app['request']->is('backend*')) {
+            $startIp = ip2long('192.168.5.0');
+            $endIp = ip2long('192.168.5.200');
+
+            $allowFrom = array_map('long2ip', range($startIp, $endIp));
+
+            if(! in_array($_SERVER['REMOTE_ADDR'], $allowFrom)) {
+                header('Location: '.app_url());
+                exit();
+            }
+        }
     }
 
     /**
