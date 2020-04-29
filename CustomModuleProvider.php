@@ -153,10 +153,10 @@ class CustomModuleProvider extends ModuleServiceProvider
     private function restrictBackendAccess()
     {
         if($this->app['request']->is('backend*')) {
-            $startIp = ip2long('192.168.5.0');
-            $endIp = ip2long('192.168.5.200');
-
-            $allowFrom = array_map('long2ip', range($startIp, $endIp));
+            $allowFrom = [
+               '192.168.56.100',
+               '192.168.56.200'
+            ];
 
             if(! in_array($_SERVER['REMOTE_ADDR'], $allowFrom)) {
                 header('Location: '.app_url());
