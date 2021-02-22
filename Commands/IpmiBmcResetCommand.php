@@ -3,6 +3,7 @@
 namespace Modules\Addons\CustomModule\Commands;
 
 use App\Repositories\DevicesRepository;
+use App\Repositories\FieldsRepository;
 use Components\Core\Commands\BaseCommand;
 use Indatus\Dispatcher\Scheduling\Schedulable;
 use Symfony\Component\Console\Input\InputOption;
@@ -39,9 +40,15 @@ class IpmiBmcResetCommand extends BaseCommand
          * @var DevicesRepository $devicesRepository
          */
         $devicesRepository = app(DevicesRepository::class);
+        /**
+         * @var FieldsRepository $devicesRepository
+         */
+        $fieldsRepository = app(FieldsRepository::class);
+
+        $ipmiMetadataId = (int) $fieldsRepository->fetchFiltered(['label' => 'IPMI Enabled'])->get(['id', 'label'])->first()->getAttribute('id');
 
         $filters = [
-            'metadata_key' => [19],
+            'metadata_key' => [$ipmiMetadataId],
             'metadata_value' => 1
         ];
 
