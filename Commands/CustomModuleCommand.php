@@ -51,7 +51,7 @@ class CustomModuleCommand extends BaseCommand
      */
     public function schedule(Schedulable $scheduler)
     {
-        $scheduler->everyMinutes(5);
+        $scheduler->never();
 
         return $scheduler;
     }

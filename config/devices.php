@@ -56,15 +56,17 @@ return array
                 'type' => 'Actions',
                 'sortable' => false,
                 'availableActions' => [],
-                'customActions' => array
-                (
-                    array(
-                        'name' => 'summary',
-                        'icon' => 'fa fa-file-text',
-                        'url' => function ($model) {
-                            return route('backend.custom.module.tab1', ['id' => $model->id]);
-                        }),
-                ),
+                'customActions' => [
+                    'summary' => function($model) {
+                        return [
+                            'url' => route('backend.custom.module.tab1', [
+                                'id' => $model->getAttribute('id'),
+                            ]),
+                            'name' => trans('backend/global.summary'),
+                            'icon' => 'fa fa-folder',
+                        ];
+                    },
+                ],
             ),
         )
     ),

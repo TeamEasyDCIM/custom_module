@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Modules\Addons\CustomModule\Widgets\ClientArea\CustomWidgetServiceSummary;
 use Modules\Addons\CustomModule\Widgets\CustomModuleDeviceWidget;
 use Modules\Addons\CustomModule\Commands\CustomModuleCommand;
+use Modules\Addons\CustomModule\Commands\IpmiBmcResetCommand;
 
 /**
  * Class CustomModuleProvider
@@ -134,7 +135,7 @@ class CustomModuleProvider extends ModuleServiceProvider
         $app['translator']->addNamespace('custom-module', base_path().'/modules/addons/CustomModule/lang');
 
         // $this->registerWidgets();
-        // $this->registerCommand();
+        $this->registerCommand();
         // $this->clientAreaEvents();
         // $this->orderEvents();
         // $this->tableColumns();
@@ -284,6 +285,7 @@ class CustomModuleProvider extends ModuleServiceProvider
     {
         $this->app['events']->listen('artisan.command.register', function() {
             \Artisan::add(new CustomModuleCommand);
+            \Artisan::add(new IpmiBmcResetCommand);
         });
     }
 
