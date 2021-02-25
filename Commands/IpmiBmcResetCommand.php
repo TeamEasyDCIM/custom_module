@@ -71,5 +71,15 @@ class IpmiBmcResetCommand extends BaseCommand
             }
         }
     }
-    
+
+    /**
+     * @param Schedulable $scheduler
+     * @return Schedulable
+     */
+    public function schedule(Schedulable $scheduler)
+    {
+        $scheduler->never();
+
+        return $scheduler;
+    }
 }

@@ -135,7 +135,7 @@ class CustomModuleProvider extends ModuleServiceProvider
         $app['translator']->addNamespace('custom-module', base_path().'/modules/addons/CustomModule/lang');
 
         // $this->registerWidgets();
-        $this->registerCommand();
+        // $this->registerCommand();
         // $this->clientAreaEvents();
         // $this->orderEvents();
         // $this->tableColumns();
