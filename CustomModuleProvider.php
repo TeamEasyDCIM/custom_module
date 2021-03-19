@@ -121,6 +121,19 @@ class CustomModuleProvider extends ModuleServiceProvider
             });
 
             /**
+             * IPAM Routes
+             */
+            $app['router']->group(['namespace' => 'Modules\Addons\CustomModule\Controller\Ipam', 'prefix' => 'backend'], function() use($app)
+            {
+                $app['router']->get('custom-module/ipam/list-subnets', [
+                    'uses' => 'SubnetsController@listSubnets'
+                ]);
+                $app['router']->get('custom-module/ipam/update-empty-gateways', [
+                    'uses' => 'SubnetsController@updateEmptyGateways'
+                ]);
+            });
+
+            /**
              * Client Area Routes
              */
             $app['router']->group(['namespace' => 'Modules\Addons\CustomModule\Controller'], function() use($app)
