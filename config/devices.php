@@ -9,7 +9,9 @@ return array
             'id' => array('label' => 'backend/global.id', 'sortable' => true, 'editable' => false),
             'type_id' => array('label' => 'backend/global.type', 'sortable' => true, 'editable' => false, 'present' => 'labeledType'),
             'device_status' => array('label' => '', 'sortable' => true, 'present' => 'labeledDeviceStatus', 'editable' => false),
-            'osImage' => array('label' => '', 'sortable' => false, 'type' => 'Image', 'width' => 30, 'lazyLoad' => 1),
+            'osImage' => array('label' => '', 'sortable' => false, 'type' => 'Image', 'width' => 30, 'lazyLoad' => 1, 'attributes' => [
+                'style' => ['min-width' => '48px']
+            ]),
             'label' => array('label' => 'backend/global.label', 'sortable' => true, 'url' => 'model:summaryURL', 'modifier' => '<strong>:value</strong>', 'attributes' => [
                 'data' => ['data-mobile-header' => 1]
             ]),
