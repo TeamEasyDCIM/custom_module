@@ -4,6 +4,7 @@ namespace Modules\Addons\CustomModule;
 
 use Components\Core\Support\Providers\ModuleServiceProvider;
 use Components\Front\Core\Widgets\CASmartBoxGenerator;
+use Components\Helpers\Backend\TabsGenerator;
 use Components\Libs\Widgets\SmartBoxGenerator;
 use EasyDcim\Components\Provisioning\Log\LogService;
 use EasyDcim\Components\Provisioning\Modules\ProvisioningModuleInterface;
@@ -12,6 +13,7 @@ use Modules\Addons\CustomModule\Widgets\ClientArea\CustomWidgetServiceSummary;
 use Modules\Addons\CustomModule\Widgets\CustomModuleDeviceWidget;
 use Modules\Addons\CustomModule\Commands\CustomModuleCommand;
 use Modules\Addons\CustomModule\Commands\IpmiBmcResetCommand;
+use Modules\Addons\CustomModule\Widgets\CustomModuleDashboardWidget;
 
 /**
  * Class CustomModuleProvider
@@ -48,6 +50,10 @@ class CustomModuleProvider extends ModuleServiceProvider
                 $app['router']->get('/custom-module/api', ['as' => 'backend.custom.module.tab2', 'uses' => 'PageController@apiRequest']);
                 $app['router']->get('/custom-module/api/get-request', ['uses' => 'PageController@getRequest']);
                 $app['router']->get('/custom-module/api/post-request', ['uses' => 'PageController@postRequest']);
+                $app['router']->get('/custom-module/devices/{id}/custom-tab', [
+                    'as' => 'backend.custom.module.device.tab', 
+                    'uses' => 'DeviceController@showCustomTab'
+                ]);
             });
 
             /**
@@ -147,17 +153,79 @@ class CustomModuleProvider extends ModuleServiceProvider
 
         $app['translator']->addNamespace('custom-module', base_path().'/modules/addons/CustomModule/lang');
 
-        // $this->registerWidgets();
+        /**
+         * Adds new features within the device
+         */
+        $this->deviceEvents();
+
+        /**
+         * Registers new commands executed in the background
+         */
         // $this->registerCommand();
+
+        /**
+         * Registers a new page in the client area section of the service summary view
+         */
         // $this->clientAreaEvents();
+
+        /**
+         * Records new function performed during order action
+         */
         // $this->orderEvents();
-        // $this->tableColumns();
-        // $this->customTemplateScripts();
         // $this->registerOrderSettings();
         // $this->serviceOrderActions();
+
+        /**
+         * Adds custom columns to the table
+         */
+        // $this->tableColumns();
+
+        /**
+         * Adds custom scripts and CSS styles
+         */
+        // $this->customTemplateScripts();
+
+        /**
+         * Blocks access to the backend section
+         */
         // $this->restrictBackendAccess();
 
+        /**
+         * Adds new widget to Dashboard section
+         */
+        $this->dashboardWidgets();
+
         parent::register('CustomModule');
+    }
+
+    /**
+     * Adds new features for the device
+     *
+     * @return void
+     */
+    private function deviceEvents()
+    {
+        /**
+         * Adds widget to device summary view
+         */
+        $this->registerWidgets();
+        
+        /**
+         * Adds a new tab in the server view
+        */
+        $this->registerTabs();
+    }
+
+    /**
+     * Adds new widget to Dashboard section
+     *
+     * @return void
+     */
+    private function dashboardWidgets()
+    {
+        $this->app['events']->listen('backend.dashboard', function(SmartBoxGenerator $widgets) {
+            $widgets->registerBox( new CustomModuleDashboardWidget());
+        });
     }
 
     /**
@@ -217,6 +285,21 @@ class CustomModuleProvider extends ModuleServiceProvider
     {
         $this->app['events']->listen('backend.devices.summary', function(SmartBoxGenerator $widgets) {
             $widgets->registerBox( new CustomModuleDeviceWidget());
+        });
+    }
+
+    /**
+     * @return void
+     */
+    private function registerTabs()
+    {
+        $this->app['events']->listen('easydcim.server.tabs: render', function(TabsGenerator $tabGenerator) {
+            $tabGenerator->appendTab(
+                [
+                    'url' => route('backend.custom.module.device.tab', array('id' => $tabGenerator->model->id)),
+                    'title' => 'Custom Device Tab'
+                ]
+            );
         });
     }
 
