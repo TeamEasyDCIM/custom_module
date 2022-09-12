@@ -4,6 +4,7 @@ namespace Modules\Addons\CustomModule;
 
 use Components\Core\Support\Providers\ModuleServiceProvider;
 use Components\Front\Core\Widgets\CASmartBoxGenerator;
+use Components\Helpers\Backend\MenuBuilder;
 use Components\Helpers\Backend\TabsGenerator;
 use Components\Libs\Widgets\SmartBoxGenerator;
 use EasyDcim\Components\Provisioning\Log\LogService;
@@ -194,6 +195,11 @@ class CustomModuleProvider extends ModuleServiceProvider
          * Adds new widget to Dashboard section
          */
         $this->dashboardWidgets();
+
+        /**
+         * Adds new link to the left menu
+         */
+        $this->renderBackendMenu();
 
         parent::register('CustomModule');
     }
@@ -471,6 +477,22 @@ class CustomModuleProvider extends ModuleServiceProvider
             if(in_array('custom_module_action_unsuspend', $configuration)) {
                 module_provisioning_log($logger->getLogger(), $module, '[Custom Module] Trying to run custom unsuspend action');
             }
+        });
+    }
+
+    /**
+     * Render backend menu link
+     */
+    protected function renderBackendMenu()
+    {
+        $this->app['events']->listen('easydcim:backend.menu.render:after', function(MenuBuilder $menuBuilder, \ArrayObject $items){
+            $items['devices']['children'][] = [
+                'key' => 'devices.custom_page',
+                'name' => 'Custom Page',
+                'url' => url('backend/devices/servers')
+            ];
+
+            return $items;
         });
     }
 }
