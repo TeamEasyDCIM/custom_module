@@ -9,11 +9,14 @@ use Components\Helpers\Backend\TabsGenerator;
 use Components\Libs\Widgets\SmartBoxGenerator;
 use EasyDcim\Components\Provisioning\Log\LogService;
 use EasyDcim\Components\Provisioning\Modules\ProvisioningModuleInterface;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Modules\Addons\CustomModule\Widgets\ClientArea\CustomWidgetServiceSummary;
 use Modules\Addons\CustomModule\Widgets\CustomModuleDeviceWidget;
 use Modules\Addons\CustomModule\Commands\CustomModuleCommand;
 use Modules\Addons\CustomModule\Commands\IpmiBmcResetCommand;
+use Modules\Addons\CustomModule\Model\CustomModel;
 use Modules\Addons\CustomModule\Widgets\CustomModuleDashboardWidget;
 
 /**
@@ -55,6 +58,9 @@ class CustomModuleProvider extends ModuleServiceProvider
                     'as' => 'backend.custom.module.device.tab', 
                     'uses' => 'DeviceController@showCustomTab'
                 ]);
+                $app['router']->get('/custom-module/custom-model-table', ['as' => 'backend.custom.module.tab3', 'uses' => 'CustomModelController@index']);
+                $app['router']->get('/custom-module/custom-model-table/filter={filters}{output?}', array('as' => 'backend.custom.module.tab3.filtered',  'uses' => 'CustomModelController@index'))
+                    ->where(array('filters' => '(.*)'));
             });
 
             /**
@@ -200,6 +206,11 @@ class CustomModuleProvider extends ModuleServiceProvider
          * Adds new link to the left menu
          */
         $this->renderBackendMenu();
+
+        /**
+         * Database Migration
+         */
+        $this->databaseMigration();
 
         parent::register('CustomModule');
     }
@@ -494,5 +505,38 @@ class CustomModuleProvider extends ModuleServiceProvider
 
             return $items;
         });
+    }
+
+    /**
+     * Database Migration
+     *
+     * @return void
+     */
+    private function databaseMigration()
+    {
+        if(! Schema::hasTable('custom_module_table'))
+        {
+            Schema::create('custom_module_table', function(Blueprint $table)
+            {
+                $table->increments('id');
+                $table->integer('item_id');
+                $table->string('name', 255)->default('');
+                $table->string('type', 48);
+                $table->text('description')->default('');
+                $table->timestamps();
+            });
+
+            $items = \DB::table('items')->lists('id', 'id');
+            $types = \DB::table('item_types')->lists('name', 'name');
+ 
+            for($i = 1; $i <= 15; $i++) {
+                CustomModel::create([
+                    'name' => vsprintf('Test Item %s', [$i]),
+                    'description' => 'Auto Generated Item',
+                    'item_id' => array_rand($items),
+                    'type' => array_rand($types)
+                ]);
+            }
+        }
     }
 }

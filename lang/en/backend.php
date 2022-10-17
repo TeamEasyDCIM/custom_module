@@ -9,5 +9,6 @@ return [
     
     'dashboard' => 'Dashboard',
     'api_test' => 'API Test',
-    'tab1' => 'Tab 1'
+    'tab1' => 'Tab 1',
+    'custom_model_table' => 'Custom Model Table'
 ];

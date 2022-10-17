@@ -1,0 +1,20 @@
+{{ quickFiltersBox|raw }}
+
+<div class="FilterBar__input">
+    <form method="get" data-url="{{ route('backend.custom.module.tab3.filtered') }}" class="filter-form" data-edc-form2="1">
+        <input type="text" class="form-control FilterBar__main-input" autocomplete="off" name="name" placeholder="{{ trans('backend/global.search') }}" value="{{ array_get(filters, 'label') }}">
+        <div class="FilterBar__dropdown-arrow"></div>
+        <div class="FilterBar__dropdown">
+            <div class="FilterBar__dropdown-content"><label class="filter-label additional-filters-label">{{ trans('backend/global.additional_filters') }}</label>
+                {{ filtersBox|raw }}
+            </div>
+            <div class="FilterBar__dropdown-footer">
+                <button type="submit" class="btn btn-primary">{{ trans('backend/global.filter_results') }}</button>
+                <a href="{{ route('backend.custom.module.tab3.filtered') }}" class="btn btn-default clear-filters">{{ trans('backend/global.clear_filters') }}</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% include 'backend::chunks.table.filters.tags' %}
+{% include 'backend::chunks.table.filters.clear' with {'clear_url' : route('backend.custom.module.tab3.filtered')} %}
