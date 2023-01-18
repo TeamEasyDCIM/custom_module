@@ -241,7 +241,7 @@ class CustomModuleProvider extends ModuleServiceProvider
     private function dashboardWidgets()
     {
         $this->app['events']->listen('backend.dashboard', function(SmartBoxGenerator $widgets) {
-            $widgets->registerBox( new CustomModuleDashboardWidget());
+            // $widgets->registerBox( new CustomModuleDashboardWidget());
         });
     }
 
