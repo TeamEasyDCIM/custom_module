@@ -60,16 +60,6 @@ class CustomModule extends AddonModule implements ModuleInterface
     }
 
     /**
-     * Module Author
-     *
-     * @return string
-     */
-    public function getAuthor()
-    {
-        return 'EasyDCIM';
-    }
-
-    /**
      * Event will fired on module activate
      *
      * @return void
