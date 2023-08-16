@@ -162,7 +162,7 @@ class PageController extends OutputController
 
         $stream = \GuzzleHttp\Psr7\stream_for($response->getBody());
 
-        s($stream->getContents());
+        adump($stream->getContents());
 
     }
 
@@ -207,9 +207,9 @@ class PageController extends OutputController
             $stream = \GuzzleHttp\Psr7\stream_for($response->getBody());
 
 
-            s($stream->getContents());
+            adump($stream->getContents());
         } catch (\Exception $e) {
-            s($e->getMessage());
+            adump($e->getMessage());
         }
     }
 }
