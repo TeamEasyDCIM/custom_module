@@ -200,17 +200,22 @@ class CustomModuleProvider extends ModuleServiceProvider
         /**
          * Adds new widget to Dashboard section
          */
-        $this->dashboardWidgets();
+        // $this->dashboardWidgets();
 
         /**
          * Adds new link to the left menu
          */
-        $this->renderBackendMenu();
+        // $this->renderBackendMenu();
 
         /**
          * Database Migration
          */
-        $this->databaseMigration();
+        // $this->databaseMigration();
+
+        /**
+         * Perform some actions before and after OS installation
+         */
+        $this->registerOsInstallationActions();
 
         parent::register('CustomModule');
     }
@@ -538,5 +543,46 @@ class CustomModuleProvider extends ModuleServiceProvider
                 ]);
             }
         }
+    }
+
+    /**
+     * Perform some actions before and after OS installation
+     * 
+     * @return void
+     */
+    protected function registerOsInstallationActions()
+    {
+        /**
+         * Event triggered before OS installation
+         */
+        $this->app['events']->listen('easydcim.modules: os.remote.provisioning.start:during', function(\Device $device, array $deviceConfiguration, array $serverConfiguration) {
+            $mac = $device->getMetaAttribute('MAC Address');
+
+            os_update_status_for_mac($mac, '[Custom Module] Start installation');
+
+            /**
+             * Perform custom actions
+             */
+        });
+
+        $this->app['events']->listen('easydcim.modules: os.remote.provisioning.cancel:during', function(\Device $device, array $deviceConfiguration, array $serverConfiguration) {
+            $mac = $device->getMetaAttribute('MAC Address');
+
+            os_update_status_for_mac($mac, '[Custom Module] Cancel installation');
+
+            /**
+             * Perform custom actions
+             */
+        });
+
+        $this->app['events']->listen('easydcim.modules: os.remote.provisioning.end:during', function(\Device $device, array $deviceConfiguration, array $serverConfiguration) {
+            $mac = $device->getMetaAttribute('MAC Address');
+
+            os_update_status_for_mac($mac, '[Custom Module] Completion of the installation');
+
+            /**
+             * Perform custom actions
+             */        
+        });
     }
 }
