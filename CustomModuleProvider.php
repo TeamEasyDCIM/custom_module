@@ -2,7 +2,7 @@
 
 namespace Modules\Addons\CustomModule;
 
-use Components\Core\Support\Providers\ModuleServiceProvider;
+use App\Providers\ModuleServiceProvider;
 use Components\Front\Core\Widgets\CASmartBoxGenerator;
 use Components\Helpers\Backend\MenuBuilder;
 use Components\Helpers\Backend\TabsGenerator;
