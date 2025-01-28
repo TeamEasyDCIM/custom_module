@@ -25,7 +25,7 @@ class GraphsController extends OutputController
         /**
          * First Admin API Key - you should enter your own user api key
          */
-        $apikey = \User::first()->apikey->key;
+        $apikey = \App\Models\User::first()->apikey->key;
 
         $client = new \GuzzleHttp\Client();
 

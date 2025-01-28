@@ -56,7 +56,7 @@ class CustomModuleDeviceWidget extends AbstractWidget implements WidgetInterface
      */
     public function render()
     {
-        /** @var \Device $device */
+        /** @var Device $device */
         $device = $this->getModel();
 
         return view('CustomModule::widgets.device.summary', ['device' => $device]);

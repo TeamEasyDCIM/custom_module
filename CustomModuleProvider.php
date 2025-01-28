@@ -2,6 +2,7 @@
 
 namespace Modules\Addons\CustomModule;
 
+use App\Models\Service;
 use App\Providers\ModuleServiceProvider;
 use Components\Front\Core\Widgets\CASmartBoxGenerator;
 use Components\Helpers\Backend\MenuBuilder;
@@ -277,7 +278,7 @@ class CustomModuleProvider extends ModuleServiceProvider
         $this->app['events']->listen('clientarea.core.sidebars', function(\ArrayObject $sidebars) {
             $params = $this->app['ca.params'];
 
-            if($params->service instanceof \Service && $params->service->getAttribute('type') == 'Server') {
+            if($params->service instanceof Service && $params->service->getAttribute('type') == 'Server') {
                 $menu = $this->app['menu.manager']->createMenu('Custom Sidebar');
 
                 $menu->addLink('External Link', [
@@ -291,8 +292,8 @@ class CustomModuleProvider extends ModuleServiceProvider
             }
         });
 
-        $this->app['events']->listen('clientarea.core.services.summary.widgets', function(CASmartBoxGenerator $generator, \Service $service) {
-            if($service instanceof \Service) {
+        $this->app['events']->listen('clientarea.core.services.summary.widgets', function(CASmartBoxGenerator $generator, Service $service) {
+            if($service instanceof Service) {
                 if($service->getAttribute('type') == 'Server') {
                     $generator->addWidget(new CustomWidgetServiceSummary($service));
                 }
@@ -333,7 +334,7 @@ class CustomModuleProvider extends ModuleServiceProvider
         /**
          * After activate service
          */
-        \Event::listen('easydcim.service.after: activate', function(\Order $order) {
+        \Event::listen('easydcim.service.after: activate', function(Order $order) {
             /**
              * @var $service \Service
              */
@@ -358,7 +359,7 @@ class CustomModuleProvider extends ModuleServiceProvider
         /**
          * After terminate service
          */
-        \Event::listen('easydcim.service.after: terminate', function(\Order $order) {
+        \Event::listen('easydcim.service.after: terminate', function(Order $order) {
             /**
              * @var $service \Service
              */
@@ -472,8 +473,8 @@ class CustomModuleProvider extends ModuleServiceProvider
     private function serviceOrderActions()
     {
         $this->app['events']->listen('easydcim.provisioning: serverprovisioningmodule.suspend.after', function(
-            \Order $order,
-            \Device $device,
+            Order $order,
+            Device $device,
             LogService $logger,
             ProvisioningModuleInterface $module,
             $configuration
@@ -484,8 +485,8 @@ class CustomModuleProvider extends ModuleServiceProvider
         });
 
         $this->app['events']->listen('easydcim.provisioning: serverprovisioningmodule.unsuspend.after', function(
-            \Order $order,
-            \Device $device,
+            Order $order,
+            Device $device,
             LogService $logger,
             ProvisioningModuleInterface $module,
             $configuration
@@ -555,7 +556,7 @@ class CustomModuleProvider extends ModuleServiceProvider
         /**
          * Event triggered before OS installation
          */
-        $this->app['events']->listen('easydcim.modules: os.remote.provisioning.start:during', function(\Device $device, array $deviceConfiguration, array $serverConfiguration) {
+        $this->app['events']->listen('easydcim.modules: os.remote.provisioning.start:during', function(Device $device, array $deviceConfiguration, array $serverConfiguration) {
             $mac = $device->getMetaAttribute('MAC Address');
 
             os_update_status_for_mac($mac, '[Custom Module] Start installation');
@@ -565,7 +566,7 @@ class CustomModuleProvider extends ModuleServiceProvider
              */
         });
 
-        $this->app['events']->listen('easydcim.modules: os.remote.provisioning.cancel:during', function(\Device $device, array $deviceConfiguration, array $serverConfiguration) {
+        $this->app['events']->listen('easydcim.modules: os.remote.provisioning.cancel:during', function(Device $device, array $deviceConfiguration, array $serverConfiguration) {
             $mac = $device->getMetaAttribute('MAC Address');
 
             os_update_status_for_mac($mac, '[Custom Module] Cancel installation');
@@ -575,7 +576,7 @@ class CustomModuleProvider extends ModuleServiceProvider
              */
         });
 
-        $this->app['events']->listen('easydcim.modules: os.remote.provisioning.end:during', function(\Device $device, array $deviceConfiguration, array $serverConfiguration) {
+        $this->app['events']->listen('easydcim.modules: os.remote.provisioning.end:during', function(Device $device, array $deviceConfiguration, array $serverConfiguration) {
             $mac = $device->getMetaAttribute('MAC Address');
 
             os_update_status_for_mac($mac, '[Custom Module] Completion of the installation');

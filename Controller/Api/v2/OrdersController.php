@@ -1,6 +1,8 @@
 <?php
 
 namespace Modules\Addons\CustomModule\Controller\Api\v2;
+
+use App\Models\Location;
 use Modules\Addons\CustomModule\Controller\OutputController;
 
 /**
@@ -22,7 +24,7 @@ class OrdersController extends OutputController
         /**
          * First Admin API Key - you should enter your own user api key
          */
-        $apikey = \User::first()->apikey->key;
+        $apikey = \App\Models\User::first()->apikey->key;
 
         $client = new \GuzzleHttp\Client();
 
@@ -37,7 +39,7 @@ class OrdersController extends OutputController
                     'client' => 1,
                     'criteria' => [
                         'model' => 23,
-                        'location' => \Location::first()->getAttribute('id'),
+                        'location' => Location::first()->getAttribute('id'),
                         'require_parts' => 1,
                         'parts' => [
                             8 => [
@@ -91,7 +93,7 @@ class OrdersController extends OutputController
         /**
          * First Admin API Key - you should enter your own user api key
          */
-        $apikey = \User::first()->apikey->key;
+        $apikey = \App\Models\User::first()->apikey->key;
 
         $client = new \GuzzleHttp\Client();
 
@@ -105,7 +107,7 @@ class OrdersController extends OutputController
                     'client' => 2,
                     'criteria' => [
                         'model' => 3,
-                        'location' => \Location::first()->getAttribute('id'),
+                        'location' => Location::first()->getAttribute('id'),
                         'require_parts' => 0,
                     ],
                     'service' => [
@@ -141,7 +143,7 @@ class OrdersController extends OutputController
         /**
          * First Admin API Key - you should enter your own user api key
          */
-        $apikey = \User::first()->apikey->key;
+        $apikey = \App\Models\User::first()->apikey->key;
 
         $client = new \GuzzleHttp\Client();
 

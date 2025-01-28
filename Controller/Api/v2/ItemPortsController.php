@@ -1,6 +1,8 @@
 <?php
 
 namespace Modules\Addons\CustomModule\Controller\Api\v2;
+
+use App\Models\ItemPort;
 use Modules\Addons\CustomModule\Controller\OutputController;
 
 /**
@@ -24,7 +26,7 @@ class ItemPortsController extends OutputController
         /**
          * First Admin API Key - you should enter your own user api key
          */
-        $apikey = \User::first()->apikey->key;
+        $apikey = \App\Models\User::first()->apikey->key;
 
         $client = new \GuzzleHttp\Client();
 
@@ -40,7 +42,7 @@ class ItemPortsController extends OutputController
                         'port_label' => 'eth0',
                         'description' => 'eth0',
                         'physaddress' => '00:0a:95:9d:68:16',
-                        'if_type' => \ItemPort::IF_TYPE_GIGABITETHERNET
+                        'if_type' => ItemPort::IF_TYPE_GIGABITETHERNET
                     ],
                 ]
             ]);
