@@ -2,7 +2,7 @@
 
 {% block contentHeader %}
     <div class="content-header-top">
-        <h1>{{ trans('CustomModule::backend.tab2') }}</h1>
+        <h1>{{ trans('CustomModule::backend.api_v3_examples') }}</h1>
     </div>
 
     <div class="content-header-tabs">
@@ -15,15 +15,49 @@
         <div class="content-scroll">
             <div class="panel">
                 <div class="panel-body">
-                    <h2>GET Request | ItemType - List the types</h2>
-                    Method <strong>getRequest()</strong> in file: /opt/easydcim/modules/addons/CustomModule/Controller/PageController.php
-                    <p><a href="https://www.easydcim.com/api/index.html#api-ItemType-Index">https://www.easydcim.com/api/index.html#api-ItemType-Index</a></p>
-                    <a target="_blank" class="btn btn-primary" href="{{ url('backend/custom-module/api/get-request') }}"><strong>Run GET Request</strong></a>
-                    <hr />
-                    <h2>POST Request | Device - Create device</h2>
-                    Method <strong>postRequest()</strong> in file: /opt/easydcim/modules/addons/CustomModule/Controller/PageController.php
-                    <p><a href="https://www.easydcim.com/api/index.html#api-Device-Create">https://www.easydcim.com/api/index.html#api-Device-Create</a></p>
-                    <a target="_blank" class="btn btn-primary" href="{{ url('backend/custom-module/api/post-request') }}"><strong>Run POST Request</strong></a>
+                    <h2>Authentication</h2>
+                    <pre>Authorization: Bearer &lt;sanctum-token&gt;
+Accept: application/json</pre>
+
+                    <h2>Example cURL</h2>
+                    <pre>curl -H "Authorization: Bearer &lt;token&gt;" \
+     -H "Accept: application/json" \
+     {{ url('api/v3/admin/custom-module/status') }}</pre>
+
+                    <h2>CustomModule API v3 endpoints</h2>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Path</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for endpoint in endpoints %}
+                                <tr>
+                                    <td><strong>{{ endpoint.method }}</strong></td>
+                                    <td><code>{{ endpoint.path }}</code></td>
+                                    <td>{{ endpoint.description }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <h2>PATCH metadata body</h2>
+                    <pre>{
+  "metadata": {
+    "Custom Module Note": "Created by API v3 example",
+    "Custom Module Enabled": "yes"
+  }
+}</pre>
+
+                    <h2>PUT settings body</h2>
+                    <pre>{
+  "notifications_enabled": true,
+  "notification_email": "admin@example.com",
+  "log_level": "info"
+}</pre>
                 </div>
             </div>
         </div>

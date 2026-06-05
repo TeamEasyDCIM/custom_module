@@ -2,6 +2,7 @@
 
 namespace Modules\Addons\CustomModule\Controller;
 
+use App\Models\Device;
 use Components\Libs\Grid\DataTableResponse;
 use Components\Libs\Grid\GridTableGenerator;
 use Components\NetConf\NetConf;
@@ -17,17 +18,17 @@ class PageController extends OutputController
      */
     public function showTab1()
     {
-        $devices = \Device::where(['type_id' => 4]);
+        $devices = Device::where(['type_id' => 4]);
 
         // Create new table generator instance
         $table = new GridTableGenerator($devices);
-        $table->setColumns(config('CustomModule::devices.columns.device'));
+        $table->setColumns(configuration_get('CustomModule::devices.columns.device'));
         $table->addAdditionalParam('editURL', route('backend.custom.module.tab1.edit.quick'));
 
         // Check whether you need a JSON response
         if ($this->wantsCleanJsonResponse()) {
             $dataResponse = new DataTableResponse($devices);
-            $dataResponse->setColumns(config('CustomModule::devices.columns.device'));
+            $dataResponse->setColumns(configuration_get('CustomModule::devices.columns.device'));
 
             return response_json($dataResponse->show());
         }
@@ -41,7 +42,7 @@ class PageController extends OutputController
      */
     public function enableAction($id)
     {
-        $device = \Device::findOrFail($id);
+        $device = Device::findOrFail($id);
 
         /**
          * Device Metadata
@@ -61,34 +62,6 @@ class PageController extends OutputController
         echo '<pre>';
         print_r($users);
         echo '</pre>';
-
-        /**
-         * Netconf Samples
-         */
-        $netconf = $device->netconf();
-
-        if($netconf instanceof NetConf) {
-            $command = $netconf->sendRPC(vsprintf('
-<load-configuration action="set">
-<configuration-set>set interfaces %s disable</configuration-set>
-</load-configuration>', ['interface-name']));
-
-            $commandErrorMessage = array_get($command->getResponseArray(), 'load-configuration-results.rpc-error.error-message');
-
-            if(! empty($commandErrorMessage)) {
-                echo '<pre>';
-                print_r($command->getRPCError());
-                echo '</pre>';
-                die();
-            }
-
-            $commit = $netconf->commit();
-
-            echo '<pre>';
-            print_r($commit->isRPCReplyOK());
-            echo '</pre>';
-            die();
-        }
     }
 
     /**
@@ -97,7 +70,7 @@ class PageController extends OutputController
      */
     public function disableAction($id)
     {
-        $device = \Device::findOrFail($id);
+        $device = Device::findOrFail($id);
 
         echo '<pre>';
         print_r($device->toArray());
@@ -114,7 +87,7 @@ class PageController extends OutputController
         $column = input_get('name');
         $value = input_get('value');
 
-        $device = \Device::findOrFail($id);
+        $device = Device::findOrFail($id);
         $device->{$column} = e($value);
 
         if ($device->save()) {
@@ -132,84 +105,25 @@ class PageController extends OutputController
     }
 
     /**
+     * Display API v3 examples.
+     *
+     * The sample module no longer shows API v2/apikey calls because API v2 is deprecated.
+     * Use Sanctum bearer tokens and the routes in Controller/Api/v3/ExampleController instead.
+     *
      * @return \View
      */
     public function apiRequest()
     {
-        return view('CustomModule::tab2.summary', []);
-    }
-
-    /**
-     * @return string|void
-     */
-    public function getRequest()
-    {
-        /**
-         * Endpoint URL
-         */
-        $url = url('api/v2/type');
-
-        $apikey = \App\Models\User::first()->apikey->key;
-
-        $client = new \GuzzleHttp\Client();
-
-        $response = $client->request('GET', $url, [
-            'headers' => [
-                'Accept' => 'application/json',
-                'apikey' => $apikey
+        return view('CustomModule::tab2.summary', [
+            'endpoints' => [
+                ['method' => 'GET', 'path' => '/api/v3/admin/custom-module/status', 'description' => 'Module status'],
+                ['method' => 'GET', 'path' => '/api/v3/admin/custom-module/stats', 'description' => 'Device and service counters'],
+                ['method' => 'GET', 'path' => '/api/v3/admin/custom-module/devices?per_page=25', 'description' => 'Paginated devices list'],
+                ['method' => 'GET', 'path' => '/api/v3/admin/custom-module/devices/{id}', 'description' => 'Single device details'],
+                ['method' => 'PATCH', 'path' => '/api/v3/admin/custom-module/devices/{id}/metadata', 'description' => 'Update selected metadata values'],
+                ['method' => 'GET', 'path' => '/api/v3/admin/custom-module/settings', 'description' => 'Read module settings'],
+                ['method' => 'PUT', 'path' => '/api/v3/admin/custom-module/settings', 'description' => 'Save module settings'],
             ],
         ]);
-
-        $stream = \GuzzleHttp\Psr7\stream_for($response->getBody());
-
-        adump($stream->getContents());
-
-    }
-
-    /**
-     * @return string|void
-     */
-    public function postRequest()
-    {
-        /**
-         * Endpoint URL
-         */
-        $url = url('api/v2/device');
-
-        /**
-         * First Admin API Key - you should enter your own user api key
-         */
-        $apikey = \App\Models\User::first()->apikey->key;
-
-        $client = new \GuzzleHttp\Client();
-
-        try {
-            $response = $client->request('POST', $url, [
-                'headers' => [
-                    'Accept' => 'application/json',
-                    'apikey' => $apikey
-                ],
-                'json' => [
-                    'data' => [
-                        'label' => 'My Device Label',
-                        'model' => 'Dell PowerEdge R210',
-                        'type_id' => 4
-                    ],
-                    'metadata' => [
-                        'Hostname' => 'myhost.net',
-                        'IP Address' => '10.10.10.100',
-                        'SNMP Public Community' => 'public',
-                        'SNMP Private Community' => 'private'
-                    ]
-                ]
-            ]);
-
-            $stream = \GuzzleHttp\Psr7\stream_for($response->getBody());
-
-
-            adump($stream->getContents());
-        } catch (\Exception $e) {
-            adump($e->getMessage());
-        }
     }
 }

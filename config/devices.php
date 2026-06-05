@@ -23,7 +23,7 @@ return array
                 'present' => 'Hostname',
                 'orderByExpression' => function ($query, $orderDirection) {
                     $query->orderByRaw(vsprintf("(select value from %s as item_fields_values where item_fields_values.item_id = %s.id and field_id = %s) %s", [
-                        table_name('item_fields_values'), table_name('items'), DB::table('types_fields')->where('slug', 'hostname')->pluck('id'), $orderDirection
+                        table_name('item_fields_values'), table_name('items'), DB::table('types_fields')->where('slug', 'hostname')->pluck('id')->first(), $orderDirection
                     ]));
                 },
                 'attributes' => [
@@ -37,7 +37,7 @@ return array
                 'present' => 'IPAddress',
                 'orderByExpression' => function ($query, $orderDirection) {
                     $query->orderByRaw(vsprintf("(select value from %s as item_fields_values where item_fields_values.item_id = %s.id and field_id = %s) %s", [
-                        table_name('item_fields_values'), table_name('items'), DB::table('types_fields')->where('slug', 'ip')->pluck('id'), $orderDirection
+                        table_name('item_fields_values'), table_name('items'), DB::table('types_fields')->where('slug', 'ip')->pluck('id')->first(), $orderDirection
                     ]));
                 },
                 'attributes' => [

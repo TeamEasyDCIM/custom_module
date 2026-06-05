@@ -44,7 +44,7 @@ return array
             'type' => 'autocomplete',
             'url' => route('backend.autocomplete.items.list'),
             'values' => 'autocomplete.backend.items.list',
-            'values_labels' => \DB::table('items')->select(['id', 'label'])->lists('label', 'id')
+            'values_labels' => fn() => \DB::table('items')->select(['id', 'label'])->pluck('label', 'id')->toArray()
         ],
         'name' => ['label' => trans('backend/global.label'), 'type' => 'text'],
         'type' => ['label' => trans('backend/global.type'), 'type' => 'text'],

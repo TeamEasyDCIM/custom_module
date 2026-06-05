@@ -3,7 +3,6 @@
 namespace Modules\Addons\CustomModule\Commands;
 
 use Components\Core\Commands\BaseCommand;
-use Indatus\Dispatcher\Scheduling\Schedulable;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -32,7 +31,7 @@ class CustomModuleCommand extends BaseCommand
      * @return mixed
      */
 
-    public function fire()
+    public function handle()
     {
         $this->info('[Custom Module] - Start');
 
@@ -43,17 +42,6 @@ class CustomModuleCommand extends BaseCommand
         $this->comment('Command Logic');
 
         $this->info('[Custom Module] - End');
-    }
-
-    /**
-     * @param Schedulable $scheduler
-     * @return Schedulable
-     */
-    public function schedule(Schedulable $scheduler)
-    {
-        $scheduler->never();
-
-        return $scheduler;
     }
     
 }

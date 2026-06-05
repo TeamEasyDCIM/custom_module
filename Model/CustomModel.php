@@ -2,8 +2,8 @@
 
 namespace Modules\Addons\CustomModule\Model;
 
-use \Components\Core\Essence\Essence;
-use Item;
+use \App\Models\Essence\Essence;
+use App\Models\Item;
 
 class CustomModel extends Essence
 {

@@ -21,9 +21,9 @@ class CustomModelController extends OutputController
 
         // Create new table generator instance
         $table = new GridTableGenerator($models);
-        $table->setColumns(config('CustomModule::customModel.columns'));
+        $table->setColumns(configuration_get('CustomModule::customModel.columns'));
 
-        $filters = config('CustomModule::customModel.filters');
+        $filters = configuration_get('CustomModule::customModel.filters');
 
         foreach($filters as $name => $params) {
             $table->addFilter($name, $params);
@@ -34,7 +34,7 @@ class CustomModelController extends OutputController
         // Check whether you need a JSON response
         if ($this->wantsCleanJsonResponse()) {
             $dataResponse = new DataTableResponse($models);
-            $dataResponse->setColumns(config('CustomModule::customModel.columns'));
+            $dataResponse->setColumns(configuration_get('CustomModule::customModel.columns'));
 
             return response_json($dataResponse->show());
         }

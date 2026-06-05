@@ -5,7 +5,6 @@ namespace Modules\Addons\CustomModule\Commands;
 use App\Repositories\DevicesRepository;
 use App\Repositories\FieldsRepository;
 use Components\Core\Commands\BaseCommand;
-use Indatus\Dispatcher\Scheduling\Schedulable;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -34,7 +33,7 @@ class IpmiBmcResetCommand extends BaseCommand
      * @return mixed
      */
 
-    public function fire()
+    public function handle()
     {
         /**
          * @var DevicesRepository $devicesRepository
@@ -70,16 +69,5 @@ class IpmiBmcResetCommand extends BaseCommand
                 $this->info(json_encode(array_get($result, 'response')));
             }
         }
-    }
-
-    /**
-     * @param Schedulable $scheduler
-     * @return Schedulable
-     */
-    public function schedule(Schedulable $scheduler)
-    {
-        $scheduler->never();
-
-        return $scheduler;
     }
 }

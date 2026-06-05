@@ -17,24 +17,16 @@ class OutputController extends ModuleController
     public function __construct()
     {
         parent::__construct();
-    }
 
-    /**
-     * @return void
-     */
-    public function setupLayout()
-    {
         // Sets the page title
         $this->setPageTitle(trans('CustomModule::backend.custom_module'));
 
         // Generate Dashboard Menu
-        $tabs = new TabsGenerator('', null, config('CustomModule::dashboard.tabs.menu'), false);
+        $tabs = new TabsGenerator('', null, configuration_get('CustomModule::dashboard.tabs.menu'), false);
 
         view_share([
             'tabs' => $tabs->render(),
         ]);
-
-        parent::setupLayout();
     }
 
     /**

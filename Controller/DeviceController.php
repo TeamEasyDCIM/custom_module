@@ -2,6 +2,7 @@
 
 namespace Modules\Addons\CustomModule\Controller;
 
+use App\Models\Device;
 use Components\Libs\Grid\DataTableResponse;
 use Components\Libs\Grid\GridTableGenerator;
 use Components\NetConf\NetConf;
@@ -17,7 +18,7 @@ class DeviceController extends OutputController
      */
     public function showCustomTab($id)
     {
-        $item = \Device::findOrFail($id);
+        $item = Device::findOrFail($id);
 
         return view('CustomModule::device.tab', [
             'item' => $item,
