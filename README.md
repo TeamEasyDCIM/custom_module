@@ -19,13 +19,10 @@ This version targets **EasyDCIM 1.25.1+** and demonstrates current Laravel/EasyD
 
 ## Installation
 
-Install the module into the EasyDCIM addon directory:
+Unzip or clone the extension into:
 
 ```bash
-cd /opt/easydcim
-git submodule add https://repository.easydcim.com/easydcim/custom_module.git modules/addons/CustomModule
-# or, in an existing checkout:
-git submodule update --init modules/addons/CustomModule
+/opt/easydcim/modules/addons/CustomModule
 ```
 
 Then activate **Custom Module** in **Modules → My Modules**.
