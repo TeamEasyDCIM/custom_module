@@ -77,7 +77,10 @@ class CustomModuleProvider extends ModuleServiceProvider
     {
         // Example: run the IPMI BMC-reset command every day at midnight.
         // Remove or adjust the schedule to match your needs.
-        $schedule->command('custom-module:ipmi-bmc-reset')->daily();
+        $schedule->command('custom-module:ipmi-bmc-reset')
+            ->daily()
+            ->withoutOverlapping()
+            ->onOneServer();
 
         // Example: run the generic sample command every hour.
         // $schedule->command('custom-module:command')->hourly();
