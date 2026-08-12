@@ -53,6 +53,11 @@ class CustomModule extends AddonModule implements ModuleInterface
         return true;
     }
 
+    public function isCustom(): bool
+    {
+        return true;
+    }
+
     /**
      * @return string
      */
