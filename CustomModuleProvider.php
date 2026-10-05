@@ -41,6 +41,7 @@ class CustomModuleProvider extends ModuleServiceProvider
      */
     public function register()
     {
+        $this->app->register(BackendUiNavigationServiceProvider::class);
         $this->app['translator']->addNamespace(
             'custom-module',
             base_path('modules/addons/CustomModule/lang')
