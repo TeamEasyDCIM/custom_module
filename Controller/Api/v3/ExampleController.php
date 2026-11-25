@@ -27,6 +27,9 @@ class ExampleController
 {
     private const OPTION_PREFIX = 'custom_module.';
 
+    /** The only device metadata this API reads and writes. */
+    public const METADATA_LABELS = ['Custom Module Note', 'Custom Module Enabled'];
+
     public function status(): JsonResponse
     {
         return ApiResponse::success(data: [
@@ -45,7 +48,7 @@ class ExampleController
         $perPage = min(max((int) $request->query('per_page', 25), 1), 100);
 
         $devices = Device::query()
-            ->with(['type', 'itemModel', 'metadata'])
+            ->with(['type', 'itemModel'])
             ->orderByDesc('id')
             ->paginate($perPage);
 
@@ -73,6 +76,8 @@ class ExampleController
     /**
      * PATCH /api/v3/admin/custom-module/devices/{id}/metadata
      *
+     * Accepts the labels of METADATA_LABELS only.
+     *
      * Example JSON body:
      * {
      *   "metadata": {
@@ -84,7 +89,8 @@ class ExampleController
     public function updateDeviceMetadata(int $id, Request $request, DevicesRepository $devices): JsonResponse
     {
         $validated = $request->validate([
-            'metadata' => ['required', 'array'],
+            // Only these keys: any other label or field ID could overwrite a credential or a system field.
+            'metadata' => ['required', 'array:' . implode(',', self::METADATA_LABELS)],
             'metadata.*' => ['nullable', 'string', 'max:1000'],
         ]);
 
@@ -151,10 +157,28 @@ class ExampleController
         ];
 
         if ($includeMetadata) {
-            $payload['metadata'] = $device->getMetaListAttribute();
+            $payload['metadata'] = $this->metadataPayload($device);
         }
 
         return $payload;
+    }
+
+    /**
+     * The metadata of this module only. The other fields of a device hold credentials (IPMI, SNMP, root password).
+     *
+     * @return array<string, mixed>
+     */
+    private function metadataPayload(Device $device): array
+    {
+        $list = [];
+        foreach ($device->getAttribute('metadata') as $value) {
+            $label = (string) $value->getAttribute('fieldLabel');
+            if (in_array($label, self::METADATA_LABELS, true) && (int) $value->getAttribute('encrypted') === 0) {
+                $list[$label] = $value->getAttribute('value');
+            }
+        }
+
+        return $list;
     }
 
     private function settingsPayload($options): array

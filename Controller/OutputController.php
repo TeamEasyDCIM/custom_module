@@ -1,39 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Addons\CustomModule\Controller;
 
-use Components\Helpers\Backend\TabsGenerator;
+use App\BackendUi\Http\Middleware\BackendUiAccess;
 use Components\Modules\Http\Controllers\ModuleController;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Route;
+use Modules\Addons\CustomModule\BackendUi\Services\CustomModuleAccess;
 
-/**
- * Class OutputController
- * @package Modules\Addons\CustomModule\Controller
- */
+/** The address the 1.x panel links a module to (My Modules, breadcrumbs): the 2.0 Overview page, or My Modules without the 2.0 panel. */
 class OutputController extends ModuleController
 {
-    /**
-     * BaseController constructor.
-     */
-    public function __construct()
+    public function getIndex(): RedirectResponse
     {
-        parent::__construct();
+        $page = 'backend.ui.'.CustomModuleAccess::PAGE_OVERVIEW;
+        // The routes of the 2.0 panel exist also where the panel is off and answers 404. EasyDCIM 1.x has no such check.
+        $panel = is_callable([BackendUiAccess::class, 'panelEnabled']) && BackendUiAccess::panelEnabled() && Route::has($page);
 
-        // Sets the page title
-        $this->setPageTitle(trans('CustomModule::backend.custom_module'));
-
-        // Generate Dashboard Menu
-        $tabs = new TabsGenerator('', null, configuration_get('CustomModule::dashboard.tabs.menu'), false);
-
-        view_share([
-            'tabs' => $tabs->render(),
-        ]);
-    }
-
-    /**
-     * @return string
-     */
-    public function getIndex()
-    {
-        return redirect_route('backend.custom.module.tab1');
+        return redirect()->to(route($panel ? $page : 'backend.modules.addons', [], false));
     }
 }

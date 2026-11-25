@@ -3,6 +3,7 @@
 namespace Modules\Addons\CustomModule\Model;
 
 use \App\Models\Essence\Essence;
+use App\Models\Device;
 use App\Models\Item;
 
 class CustomModel extends Essence
@@ -41,6 +42,16 @@ class CustomModel extends Essence
     public function item()
     {
         return $this->belongsTo(Item::class);
+    }
+
+    /**
+     * The device of the item; null when the item is not a device.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function device()
+    {
+        return $this->belongsTo(Device::class, 'item_id');
     }
 
     /**

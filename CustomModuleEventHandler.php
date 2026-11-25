@@ -1,45 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Addons\CustomModule;
 
 use App\Models\Device;
 use App\Models\Order;
 use App\Models\Service;
-use Components\Helpers\Backend\MenuBuilder;
-use Components\Helpers\Backend\TabsGenerator;
-use Components\Libs\Widgets\SmartBoxGenerator;
+use ArrayObject;
 use EasyDcim\Components\Provisioning\Log\LogService;
 use EasyDcim\Components\Provisioning\Modules\ProvisioningModuleInterface;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Modules\Addons\CustomModule\Widgets\CustomModuleDashboardWidget;
-use Modules\Addons\CustomModule\Widgets\CustomModuleDeviceWidget;
 
 /**
- * CustomModule event subscriber.
+ * Backend domain event subscriber for Custom Module.
  *
- * EasyDCIM automatically subscribes {ModuleName}EventHandler for addons.
- * Put event wiring here instead of growing CustomModuleProvider.
+ * EasyDCIM automatically subscribes `{ModuleName}EventHandler` for active addons.
+ * Keep domain event automation here; the 2.0 panel parts (menu, pages, Servers list and
+ * device Summary extensions) are registered in
+ * {@see \Modules\Addons\CustomModule\BackendUi\CustomModuleBackendUiProvider}.
  */
 class CustomModuleEventHandler
 {
     /**
-     * Register module event listeners.
+     * Register domain event listeners for OS installation, service lifecycle, and provisioning.
      *
-     * @param mixed $events
-     * @return void
+     * @param  mixed  $events  Laravel event dispatcher instance.
      */
-    public function subscribe($events): void
+    public function subscribe(mixed $events): void
     {
-        // Device page examples.
-        $events->listen('backend.devices.summary', [$this, 'registerDeviceSummaryWidget']);
-        $events->listen('easydcim.server.tabs: render', [$this, 'registerDeviceTab']);
-
-        // Backend UI examples.
-        $events->listen('backend.dashboard', [$this, 'registerDashboardWidget']);
-        $events->listen('easydcim.grid: columns', [$this, 'registerGridColumns']);
-        $events->listen('easydcim:backend.menu.render:after', [$this, 'registerBackendMenuItem']);
-
         // OS installation lifecycle examples.
         $events->listen('easydcim.modules: os.remote.provisioning.start:during', [$this, 'onOsInstallationStart']);
         $events->listen('easydcim.modules: os.remote.provisioning.cancel:during', [$this, 'onOsInstallationCancel']);
@@ -52,98 +41,50 @@ class CustomModuleEventHandler
         // $events->listen('easydcim.provisioning: server.service.unsuspend', [$this, 'registerUnsuspendOrderAction']);
         // $events->listen('easydcim.provisioning: serverprovisioningmodule.suspend.after', [$this, 'afterProvisioningSuspend']);
         // $events->listen('easydcim.provisioning: serverprovisioningmodule.unsuspend.after', [$this, 'afterProvisioningUnsuspend']);
-
-        // Optional asset example. Uncomment when you add real files in templates/admin/default/assets.
-        // $events->listen('easydcim.assets: template.js', [$this, 'registerTemplateScripts']);
-        //$events->listen('easydcim.assets: template.css', [$this, 'registerTemplateStyles']);
     }
 
-    public function registerDeviceSummaryWidget(SmartBoxGenerator $widgets): void
-    {
-        $widgets->registerBox(new CustomModuleDeviceWidget());
-    }
-
-    public function registerDeviceTab(TabsGenerator $tabGenerator): void
-    {
-        $tabGenerator->appendTab([
-            'url' => route('backend.custom.module.device.tab', ['id' => $tabGenerator->model->id]),
-            'title' => 'Custom Device Tab',
-        ]);
-    }
-
-    public function registerDashboardWidget(SmartBoxGenerator $widgets): void
-    {
-        $widgets->registerBox(new CustomModuleDashboardWidget());
-    }
-
-    public function registerGridColumns(Collection $columns, string $modelName, string $path): Collection
-    {
-        if ($modelName !== 'server') {
-            return $columns;
-        }
-
-        $columnKey = 'custom_module_value';
-        $columnDefinition = [
-            'label' => trans('custom-module::backend.custom_value'),
-            'sortable' => false,
-            'type' => 'Key',
-            // Example: render any custom value computed by your module.
-            // This can come from metadata, an external API, or another module table.
-            'value' => static fn ($model) => sprintf('CustomModule #%s', $model->getKey()),
-        ];
-
-        // Insert the custom column directly before the Actions column
-        // (in the server grid this column key is ':actions').
-        $actionsColumnKey = $columns->has(':actions') ? ':actions' : 'actions';
-
-        if (! $columns->has($actionsColumnKey)) {
-            $columns->put($columnKey, $columnDefinition);
-
-            return $columns;
-        }
-
-        $columns->forget($columnKey);
-        $orderedColumns = $columns->all();
-        $columns->forget($columns->keys()->all());
-
-        foreach ($orderedColumns as $key => $definition) {
-            if ($key === $actionsColumnKey) {
-                $columns->put($columnKey, $columnDefinition);
-            }
-
-            $columns->put($key, $definition);
-        }
-
-        return $columns;
-    }
-
-    public function registerBackendMenuItem(MenuBuilder $menuBuilder, \ArrayObject $items): \ArrayObject
-    {
-        $items['devices']['children'][] = [
-            'key' => 'devices.custom_page',
-            'name' => 'Custom Page',
-            'url' => route('backend.custom.module.tab1'),
-        ];
-
-        return $items;
-    }
-
+    /**
+     * Handle OS installation start event.
+     *
+     * @param  Device  $device  Target device undergoing OS installation.
+     * @param  array<string, mixed>  $deviceConfiguration  Device provisioning configuration.
+     * @param  array<string, mixed>  $serverConfiguration  Provisioning server configuration.
+     */
     public function onOsInstallationStart(Device $device, array $deviceConfiguration, array $serverConfiguration): void
     {
         $this->updateOsStatus($device, '[Custom Module] Start installation');
     }
 
+    /**
+     * Handle OS installation cancellation event.
+     *
+     * @param  Device  $device  Target device whose OS installation was cancelled.
+     * @param  array<string, mixed>  $deviceConfiguration  Device provisioning configuration.
+     * @param  array<string, mixed>  $serverConfiguration  Provisioning server configuration.
+     */
     public function onOsInstallationCancel(Device $device, array $deviceConfiguration, array $serverConfiguration): void
     {
         $this->updateOsStatus($device, '[Custom Module] Cancel installation');
     }
 
+    /**
+     * Handle OS installation completion event.
+     *
+     * @param  Device  $device  Target device that finished OS installation.
+     * @param  array<string, mixed>  $deviceConfiguration  Device provisioning configuration.
+     * @param  array<string, mixed>  $serverConfiguration  Provisioning server configuration.
+     */
     public function onOsInstallationEnd(Device $device, array $deviceConfiguration, array $serverConfiguration): void
     {
         $this->updateOsStatus($device, '[Custom Module] Completion of the installation');
     }
 
-    public function afterServiceActivate($order): void
+    /**
+     * React after a client service is activated.
+     *
+     * @param  mixed  $order  Activated order model.
+     */
+    public function afterServiceActivate(mixed $order): void
     {
         /** @var Service $service */
         $service = $order->getAttribute('service');
@@ -162,7 +103,12 @@ class CustomModuleEventHandler
         }
     }
 
-    public function afterServiceTerminate($order): void
+    /**
+     * React after a client service is terminated.
+     *
+     * @param  mixed  $order  Terminated order model.
+     */
+    public function afterServiceTerminate(mixed $order): void
     {
         /** @var Service $service */
         $service = $order->getAttribute('service');
@@ -183,58 +129,80 @@ class CustomModuleEventHandler
         }
     }
 
-    public function registerSuspendOrderAction(\ArrayObject $options): \ArrayObject
+    /**
+     * Register a custom suspend order action option.
+     *
+     * @param  ArrayObject<string, string>  $options  Available suspend action options.
+     * @return ArrayObject<string, string> Updated options.
+     */
+    public function registerSuspendOrderAction(ArrayObject $options): ArrayObject
     {
         $options['custom_module_action_suspend'] = '[Custom Module] Custom Suspend Action';
 
         return $options;
     }
 
-    public function registerUnsuspendOrderAction(\ArrayObject $options): \ArrayObject
+    /**
+     * Register a custom unsuspend order action option.
+     *
+     * @param  ArrayObject<string, string>  $options  Available unsuspend action options.
+     * @return ArrayObject<string, string> Updated options.
+     */
+    public function registerUnsuspendOrderAction(ArrayObject $options): ArrayObject
     {
         $options['custom_module_action_unsuspend'] = '[Custom Module] Custom Unsuspend Action';
 
         return $options;
     }
 
+    /**
+     * Run custom logic after a provisioning module suspends a service.
+     *
+     * @param  Order  $order  Affected order.
+     * @param  Device  $device  Provisioned device.
+     * @param  LogService  $logger  Provisioning log service.
+     * @param  ProvisioningModuleInterface  $module  Active provisioning module.
+     * @param  array<int, string>  $configuration  Enabled suspend actions.
+     */
     public function afterProvisioningSuspend(
         Order $order,
         Device $device,
         LogService $logger,
         ProvisioningModuleInterface $module,
-        array $configuration
+        array $configuration,
     ): void {
         if (in_array('custom_module_action_suspend', $configuration, true)) {
             module_provisioning_log($logger->getLogger(), $module, '[Custom Module] Trying to run custom suspend action');
         }
     }
 
+    /**
+     * Run custom logic after a provisioning module unsuspends a service.
+     *
+     * @param  Order  $order  Affected order.
+     * @param  Device  $device  Provisioned device.
+     * @param  LogService  $logger  Provisioning log service.
+     * @param  ProvisioningModuleInterface  $module  Active provisioning module.
+     * @param  array<int, string>  $configuration  Enabled unsuspend actions.
+     */
     public function afterProvisioningUnsuspend(
         Order $order,
         Device $device,
         LogService $logger,
         ProvisioningModuleInterface $module,
-        array $configuration
+        array $configuration,
     ): void {
         if (in_array('custom_module_action_unsuspend', $configuration, true)) {
             module_provisioning_log($logger->getLogger(), $module, '[Custom Module] Trying to run custom unsuspend action');
         }
     }
 
-    public function registerTemplateScripts(\ArrayObject $scripts): \ArrayObject
-    {
-        $scripts[] = base_path('modules/addons/CustomModule/templates/admin/default/assets/js/custom-app.js');
-
-        return $scripts;
-    }
-
-    public function registerTemplateStyles(\ArrayObject $styles): \ArrayObject
-    {
-        $styles[] = base_path('modules/addons/CustomModule/templates/admin/default/assets/css/style.css');
-
-        return $styles;
-    }
-
+    /**
+     * Update the OS installation status message for the device's MAC address.
+     *
+     * @param  Device  $device  Target device.
+     * @param  string  $message  Status message to record.
+     */
     private function updateOsStatus(Device $device, string $message): void
     {
         $mac = $device->getMetaAttribute('MAC Address');
